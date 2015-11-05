@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by zoruk on 04.11.15.
+ * Created by Loïc Haas on 04.11.15.
  */
 public class SymComManager {
     private static final String LOG_TAG = SymComManager.class.getName();
@@ -24,14 +24,17 @@ public class SymComManager {
 
     }
 
+    // Liste des listeners
     private List<CommunicationEventListener> mListeners = new ArrayList<>();
 
     public void sendRequest(String request, String link) {
+        // Démarrage de la tache asyncrone
         new AsyncHttpPostRequest().execute(link, request);
     }
 
+    // Ajout d'un listener sur le résultat
     public void addCommunicationEventListener(CommunicationEventListener listener) {
-        synchronized (mListeners) {
+        synchronized (mListeners) { // Normalement pas nessaire vu que c'est appelé par le thread ui
             mListeners.add(listener);
         }
     }
@@ -44,6 +47,8 @@ public class SymComManager {
             if (params.length != 2) {
                 return null;
             }
+
+            // Vérifie et genere l'url
             URL url;
             try {
                 url = new URL(params[0]);
@@ -52,17 +57,14 @@ public class SymComManager {
                 return null;
             }
 
+            // Les données a envoyer
             String payload = params[1];
 
-            HttpURLConnection connection;
+            HttpURLConnection connection = null;
             InputStream is = null;
             try {
                 connection = (HttpURLConnection) url.openConnection();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            try {
+
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Accept-Charset", ENCODING);
                 //connection.setRequestProperty("Content-type", "application/json");
@@ -75,9 +77,11 @@ public class SymComManager {
 
                 connection.connect();
 
+                // Affichage du code de résultat
                 Log.d(LOG_TAG, "Connection result : " + connection.getResponseCode() + " content " + connection.getResponseMessage());
                 is = connection.getInputStream();
 
+                // Lecture de donnée renvoyée par le serveur
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
                 StringBuilder sb = new StringBuilder();
@@ -92,7 +96,8 @@ public class SymComManager {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                connection.disconnect();
+                if (connection != null)
+                    connection.disconnect();
                 if (is != null)
                     try {
                         is.close();
@@ -109,7 +114,8 @@ public class SymComManager {
             if (s == null)
                 return;
 
-            synchronized (mListeners) {
+            // Appel les handlers
+            synchronized (mListeners) { // Normalement pas nessaire vu que c'est appelé par le thread ui
                 for (CommunicationEventListener e : mListeners) {
                     if (e.handleServerResponse(s))
                         return;

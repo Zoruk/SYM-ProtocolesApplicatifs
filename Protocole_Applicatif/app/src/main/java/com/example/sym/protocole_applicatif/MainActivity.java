@@ -25,6 +25,7 @@ import java.util.zip.ZipOutputStream;
 public class MainActivity extends Activity {
     private static final String LOG_TAG = MainActivity.class.getName();
 
+    // Different manager de communication car les résultats sont traité differement
     private SymComManager basicComManager = new SymComManager();
     private SymComManager jsonComManager = new SymComManager();
     private SymComManager base64ComManager = new SymComManager();
@@ -34,6 +35,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // initialisation des handlers
         Button send_basic = (Button) findViewById(R.id.send_basic);
         Button send_json = (Button) findViewById(R.id.send_json);
         Button send_zipbase64 = (Button) findViewById(R.id.send_zipbase64);
@@ -41,6 +43,7 @@ public class MainActivity extends Activity {
         send_basic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Envoie avec le bon manager traiter le résultat correctement
                 basicComManager.sendRequest("Super salut", "http://moap.iict.ch:8080/Moap/Basic");
             }
         });
@@ -48,6 +51,7 @@ public class MainActivity extends Activity {
         send_json.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Génére des data bidon en json
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("MyValue", "doge");
@@ -56,6 +60,7 @@ public class MainActivity extends Activity {
                     e.printStackTrace();
                     return;
                 }
+                // Envoie avec le bon manager traiter le résultat correctement
                 jsonComManager.sendRequest(jsonObject.toString(), "http://moap.iict.ch:8080/Moap/Json");
             }
         });
@@ -63,8 +68,10 @@ public class MainActivity extends Activity {
         send_zipbase64.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // Zip une chaine et l'envoie au serveur en Base64
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                ZipOutputStream zip;
+                ZipOutputStream zip = null;
 
                 try {
                     zip = new ZipOutputStream(out);
@@ -78,6 +85,7 @@ public class MainActivity extends Activity {
                 }
                 String base64 = Base64.encodeToString(out.toByteArray(), Base64.DEFAULT);
                 Log.d(LOG_TAG, "Base64 : " + base64);
+                // Envoie avec le bon manager traiter le résultat correctement
                 base64ComManager.sendRequest(base64, "http://moap.iict.ch:8080/Moap/ZipBase64");
             }
         });
@@ -86,6 +94,7 @@ public class MainActivity extends Activity {
             @Override
             public boolean handleServerResponse(String response) {
                 Log.d(LOG_TAG, "Response " + response);
+                // Affiche le message tel quel
                 if (response != null) {
                     TextView result = (TextView) findViewById(R.id.textview_result);
                     result.setText(response);
@@ -98,6 +107,7 @@ public class MainActivity extends Activity {
             @Override
             public boolean handleServerResponse(String response) {
                 Log.d(LOG_TAG, "Response " + response);
+                // format le json et l'affiche
                 if (response != null) {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
@@ -117,6 +127,7 @@ public class MainActivity extends Activity {
             public boolean handleServerResponse(String response) {
                 Log.d(LOG_TAG, "Response " + response);
                 if (response != null) {
+                    // Unzip le message et l'affiche
                     byte[] zipByteArray = Base64.decode(response, Base64.DEFAULT);
                     ByteArrayInputStream is = new ByteArrayInputStream(zipByteArray);
                     ZipInputStream zipInputStream = new ZipInputStream(is);
