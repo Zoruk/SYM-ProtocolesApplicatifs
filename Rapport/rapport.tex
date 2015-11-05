@@ -1,0 +1,83 @@
+% Compiler ce document 
+
+% package de base
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+
+% langues
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage[hidelinks]{hyperref} % liens
+\usepackage{fancyhdr} % En tetes / bas de page
+\usepackage{uarial} % police arial
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor} % Style pour affichage du C
+\usepackage{courier} % police pour les listings
+
+% Page de Garde -- Necessite d'installer le package titling, si probleme
+% commenter la ligne suivante ainsi que les infos necessaires a la page
+% de garde
+\usepackage{pageGarde/HEIG_STY}
+
+\input{utils/myCommands.tex}
+\input{utils/myColors.tex}
+\input{utils/myConfigurations.tex}
+
+% Mise en forme de la page de titre
+\author{Domingues Pedrosa João Miguel \\ Haas Loïc}
+\title{Protocole applicatif}
+
+% Informations necessaires a la page de garde
+% Commenter si probleme de compilation
+\acro{SYM}
+\cours{Système Mobile}
+\date{\today}
+
+%en-tête
+\lhead{Domingues João \\ Haas Loïc}
+\chead{Protocole Applicatif}
+\rhead{\theAcro}
+
+%pied-de-page
+\lfoot{HEIG-VD}
+\cfoot{\today}
+\rfoot{\thepage}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+%Ici commence réelement l'écriture du rapport
+
+\section{Authentification}
+Il est tout à fait possible de transmettre même avec une authentification requise.
+Pour cela, lors de l'envoie, il fraudais d'abord envoie le nécessaire pour l'authentification, cela implique qu'il faut autoriser la sauvegarde des identifiant à quelque part afin de permettre l'envoie asynchrone.
+
+\section{Threads concurrents}
+Il y des problème de synchronisation lors de la modification de l'interface graphique. 
+Si par exemple on fait un rotation, on régénéré une activité et la tâche en cours se termine brusquement.
+
+\section{Écriture différée}
+
+\section{Transmission d'objets}
+L'inconvénient du infrastructure n'offrant pas de validation de la syntaxe est que la forme de l'information doit être connue par les utilisateurs. 
+En effet, on n'arrive pas à identifier la donnée par exemple avec des balises ou autre.
+L'avantage est que se type format est léger, compréhensible, il n'a pas besoin de bien connaître la syntaxe pour l'utiliser.
+On peut envoyer plusieurs type de données comme des tableaux, images, etc.
+
+\section{Transmission comprimée}
+Le taux de compression dépend des données compresser. 
+Si on compresser un fichier avec beaucoup de répétition, par exemple du texte, on aura un bon taux.
+On peut en moyenne espérer un gain de 10 fois plus petit que le fichier original.
+
+\end{document}
