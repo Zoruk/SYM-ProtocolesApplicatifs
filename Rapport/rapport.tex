@@ -76,10 +76,12 @@ La restriction serait que pour tout interaction avec l'utilisateur, il faudrait 
 Premièrement, pour indiquer à l'utilisateur qu'une validation de sa part est nécessaire afin de continuer le bon fonctionnement de l'application. Deuxièmement, il est interdit sur android de lancer une activité sans que l'utilisateur n'est rien demander.
 Pour la transmission en différé, si tout a été confirmer avant, il enverra une fois que la connexion au serveur sera possible car dans les données à envoyer, on devrait au préalable avoir les différents champs pour l'authentification.
 
+Pour faire des transmission asyncrone avec authentification me mieux serrais d'utiliser le service fourni par Android SyncAdapter qui dispose d'un moyen de d'enregistrer les identifiants (après ils apparaissent dans la section compte des paramètres du périphérique android) et de plus il fais les transferts de donnée de manière optimisée pour la batterie en regroupant un maximum de communication de toutes les application utilisant ce service affin de ne pas réveiller trop souvent le service pour les donnée mobile ce qui consome beaucoup de batterie.
 \section{Threads concurrents}
-Il y des problème de synchronisation lors de la modification de l'interface graphique. 
+Il y des problème de synchronisation lors de la modification de l'interface utilisateur. 
 Il peut y avoir des accès concurrent quand aux données entre l'envoie et la réception.
 Par exemple, une variable utilisé par les deux threads qu'il faudrait protéger afin d'éviter des problème d'incohérences quand elle est manipuler.
+
 Un autre problème serait que lorsqu'on envoie un message, on attendrai une réponse. 
 Il se peut quand même temps qu'on envoie on reçoit quelque chose et que l'on traite la réception pour le message juste envoyer alors que cela n'a rien à voir, donc problème de synchronisation entre les deux threads.
 
@@ -94,13 +96,12 @@ Dans le deuxième cas, on utilise la même queue mais on ouvre d'abord la connex
 
 L'avantage de la première solution, c'est qu'a chaque écriture correspond une transmission, il est donc plus facile lorsque l'on reçoit une réponse de la gérer car on sait à quel connexion correspond le message. Dans le deuxième, l'avantage est que l'on est plus efficace, on ouvre un seule connexion pour tout les messages au lieu d'en ouvrir et fermer à chaque envoie ce qui est mieux d'un point de vue temps. 
 
+Encore une fois pour ce cas le mieux serrais d'utiliser SyncAdapter qui se charge de regrouper les communication réseau simultanément pour économiser la batterie. Ce n'est pas pour autant que tout est transféré en une seul connexion mais elle sont toutes regroupée dans le temps ce qui optimise l'utilisation de la batterie.
 
 \section{Transmission d'objets}
 L'inconvénient du infrastructure n'offrant pas de validation de la syntaxe est que la forme de l'information doit être connue par les utilisateurs. 
-En effet, on n'arrive pas à identifier la donnée par exemple avec des balises ou autre. 
-Ceci est gênant si on crée une application et qu'elle doit récupérer des données d'un serveur, comme la structure n'est pas défini on c'est pas comment gérer l'information reçu.
-L'avantage est que se type format est léger car il  ne comporte pas de balise comme en XML pour indiquer le nom de la donnée donc moins de caractère, c
-compréhensible et facile à utiliser, il n'a pas besoin de bien connaître la syntaxe pour l'utiliser.
+Ceci est gênant si on crée une application et qu'elle doit récupérer des données d'un serveur, comme la structure n'est pas automatiquement vérifiée on doit le faire nous-même sous peine d'avoir des incohérences lors de la lecture.
+L'avantage est que se type format est léger car il  ne comporte pas de balise comme en XML pour indiquer le nom de la donnée donc moins de caractère, de plus JSON est facilement formatable de manière compréhensible en un simple coup d'œil et facile à utiliser, il n'a pas besoin de des heures à apprendre la syntaxe pour l'utiliser de manière correct.
 
 
 \section{Transmission comprimée}
